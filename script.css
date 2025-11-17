@@ -25,17 +25,18 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 0 25px rgba(0,0,0,0.5);
     text-align: center;
+    position: relative;
 }
 
 /* PLAYER TITLE (BEATX) */
 .player-title {
     font-size: 26px;
-    font-weight: 700;
+    font-weight: 800;
     margin-bottom: 15px;
     background: linear-gradient(90deg, #ff73fa, #6ddcff);
     -webkit-background-clip: text;
     color: transparent;
-    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    text-shadow: 0 0 12px rgba(255,255,255,0.5);
 }
 
 /* ALBUM BOX */
@@ -45,43 +46,13 @@ body {
     margin: 0 auto;
     border-radius: 25px;
     overflow: hidden;
-    background: none;
+    position: relative;
+
     border: 2px solid rgba(255,255,255,0.25);
     animation: rotateAlbum 12s linear infinite;
-    position: relative;   /* IMPORTANT for pulse */
 }
 
-/* 🔥 PULSE EFFECT ADDED */
-.album-box::after {
-    content: "";
-    position: absolute;
-    width: 65px;
-    height: 65px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation: pulse 1.6s infinite ease-in-out;
-    pointer-events: none;
-}
-
-@keyframes pulse {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0.5;
-    }
-    50% {
-        transform: translate(-50%, -50%) scale(1.25);
-        opacity: 0.9;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0.5;
-    }
-}
-
-/* IMAGE */
+/* ROTATING BACKGROUND IMAGE */
 .album-box img {
     width: 100%;
     height: 100%;
@@ -89,6 +60,21 @@ body {
     filter: brightness(1.1);
 }
 
+/* STATIC CENTER LOGO */
+.center-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 75px;           /* CHANGE SIZE HERE */
+    height: 75px;
+    transform: translate(-50%, -50%);
+    border-radius: 14px;   /* MAKE IT ROUND: change to 50% */
+    z-index: 5;
+    pointer-events: none;
+    box-shadow: 0 0 15px rgba(255,255,255,0.3);
+}
+
+/* ROTATION ANIMATION */
 @keyframes rotateAlbum {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
@@ -97,7 +83,7 @@ body {
 /* SONG NAME */
 .song-name {
     margin: 18px 0;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     text-shadow: 0 0 10px rgba(255,255,255,0.7);
 }
