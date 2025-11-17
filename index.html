@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>beatx player made by aniket</title>
+<meta name="theme-color" content="#2f0060" />
+
+<style>
+:root{
+  --bg1:#164a66;       /* lighter blue */
+  --bg2:#062034;
+  --neon1:#ff6de5;
+  --neon2:#60ddff;
+  --muted:rgba(255,255,255,0.82);
+  --card-radius:18px;
+}
+
+/* Reset */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:Inter, Poppins, system-ui, -apple-system, "Segoe UI", Roboto, Arial}
+body{
+  display:flex;align-items:center;justify-content:center;
+  background: linear-gradient(120deg,var(--bg1),var(--bg2));
+  background-size:400% 400%; animation:bgMove 16s linear infinite;
+  color:#fff;padding:18px;
+}
+@keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* App card */
+.app {
+  width:100%;max-width:720px;border-radius:var(--card-radius);
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));
+  padding:22px;box-shadow:0 30px 80px rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.03);
+  overflow:hidden; display:flex; gap:20px; align-items:flex-start;
+}
+
+/* Left column (player) */
+.left {
+  flex:1; min-width:300px; display:flex; flex-direction:column; align-items:center;
+}
+
+/* Right column (playlist) */
+.right {
+  width:300px; max-width:320px; border-radius:12px; padding:12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));
+  border:1px solid rgba(255,255,255,0.03); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  display:flex; flex-direction:column; gap:10px;
+}
+
+/* Title */
+.header { width:100%; text-align:center; margin-bottom:6px; }
+#titleText { font-weight:800; font-size:20px; letter-spacing:0.6px;
+  background: linear-gradient(90deg,var(--neon1),var(--neon2));
+  -webkit-background-clip:text; color:transparent; display:inline-block;
+  border-right:2px solid rgba(255,255,255,0.9); padding-right:6px; }
+.header-sub { font-size:12px; color:var(--muted); margin-top:6px }
+
+/* Disk */
+.disk { width:260px; height:260px; border-radius:18px; overflow:hidden;
+  background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  border:3px solid rgba(255,255,255,0.02); box-shadow:0 20px 40px rgba(0,0,0,0.45);
+  display:flex;align-items:center;justify-content:center; position:relative; }
+.disk img { width:100%; height:100%; object-fit:cover; display:block; filter:contrast(1.02) saturate(1.05) brightness(1.02); }
+.disk.playing { animation: spin 14s linear infinite; } @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.rim{ position:absolute; inset:10px; border-radius:12px; pointer-events:none; mix-blend-mode:screen; transition:box-shadow .12s linear }
+
+/* Song title */
+.songTitleWrap{ width:100%; text-align:center; margin-top:12px; }
+.songTitle { font-weight:700; font-size:16px; color:#fff; text-shadow:0 0 8px rgba(255,255,255,0.06) }
+
+/* Visualizer */
+.visualizer{ display:flex; gap:6px; height:48px; align-items:flex-end; justify-content:center; margin-top:12px }
+.vbar{ width:8px; height:10px; border-radius:6px; background:linear-gradient(180deg,var(--neon1),var(--neon2)); transition:height 80ms linear }
+
+/* Controls */
+.controls{ display:flex; gap:14px; align-items:center; justify-content:center; margin-top:14px }
+.btn{ width:64px;height:64px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)); box-shadow:0 8px 22px rgba(0,0,0,0.45); color:#fff; font-size:18px; display:flex;align-items:center;justify-content:center }
+.btn.play{ width:84px;height:84px;border-radius:18px;background: linear-gradient(90deg,var(--neon2),var(--neon1)); color:#040014; font-weight:800; box-shadow:0 18px 60px rgba(170,60,255,0.12) }
+.btn:active{ transform:translateY(3px) }
+
+/* Progress */
+.progress{ width:100%; margin-top:16px }
+.timeRow{ display:flex; justify-content:space-between; color:var(--muted); font-size:13px; margin-bottom:8px }
+input[type=range].seek{ width:100%; height:8px; background:linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); border-radius:999px; -webkit-appearance:none; }
+input[type=range].seek::-webkit-slider-thumb{ -webkit-appearance:none; width:18px;height:18px;border-radius:50%; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.5); }
+
+/* Bottom row: choose / download / volume / install */
+.bottomRow { width:100%; display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:18px; flex-wrap:wrap }
+.chooseBtn{ flex:1; padding:12px 14px; border-radius:12px; border:none; background:linear-gradient(90deg,var(--neon1),var(--neon2)); color:#080018; font-weight:700; cursor:pointer }
+.downloadBtn{ padding:10px 12px; border-radius:12px; border:none; background:rgba(255,255,255,0.03); color:var(--muted); font-weight:700; cursor:pointer }
+.instBtn{ padding:10px 12px; border-radius:12px; border:none; background:linear-gradient(90deg,#72ffa6,#60ddff); color:#052; font-weight:800; cursor:pointer; display:none }
+
+/* Playlist */
+.playlistTitle{ font-weight:800; margin-bottom:4px; color:var(--muted) }
+.playlist{ display:flex; flex-direction:column; gap:8px; overflow:auto; max-height:480px; padding-right:6px }
+.playItem{ padding:10px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; gap:8px; cursor:pointer; transition:background .12s }
+.playItem:hover{ background:rgba(255,255,255,0.02) }
+.playItem.active{ background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-left:4px solid var(--neon1) }
+.playMeta{ display:flex; gap:8px; align-items:center }
+.playName{ font-weight:700; color:#fff; max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.playActions{ display:flex; gap:8px; align-items:center }
+.smallBtn{ padding:6px 8px; border-radius:8px; background:rgba(255,255,255,0.03); border:none; color:var(--muted); cursor:pointer; font-weight:700 }
+
+/* footer */
+.footer{ text-align:center; margin-top:10px; color:var(--muted); font-weight:700 }
+
+/* small screens */
+@media (max-width:880px){
+  .app{ flex-direction:column; align-items:center }
+  .right{ width:100%; max-width:640px }
+  .left{ width:100% }
+  .disk{ width:200px; height:200px }
+}
+</style>
+</head>
+<body>
+
+<div class="app" role="application" aria-label="BeatX Music Player">
+
+  <!-- PLAYER LEFT -->
+  <div class="left">
+    <div class="header">
+      <div id="titleText">beatx player made by aniket</div>
+      <div class="header-sub">Real-time • Playlist • PWA Installable</div>
+    </div>
+
+    <div class="disk" id="disk">
+      <img id="coverImg" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIHJ4PScyNScgZmlsbD0nI2NlY2YyMCcvPjwvc3ZnPg==" alt="cover">
+      <div class="rim" id="rim"></div>
+    </div>
+
+    <div class="songTitleWrap">
+      <div class="songTitle" id="songTitle">No song selected</div>
+    </div>
+
+    <div class="visualizer" id="visualizer">
+      <div class="vbar"></div><div class="vbar"></div><div class="vbar"></div><div class="vbar"></div><div class="vbar"></div>
+    </div>
+
+    <div class="controls" role="toolbar">
+      <button class="btn" id="prevBtn" title="Prev">⏮</button>
+      <button class="btn play" id="playBtn" title="Play/Pause">▶</button>
+      <button class="btn" id="nextBtn" title="Next">⏭</button>
+    </div>
+
+    <div class="progress">
+      <div class="timeRow"><span id="currentTime">0:00</span><span id="totalTime">0:00</span></div>
+      <input type="range" class="seek" id="seek" min="0" value="0" step="1" aria-label="Seek">
+    </div>
+
+    <div class="bottomRow">
+      <input type="file" id="fileInput" accept="audio/*" multiple style="display:none">
+      <button class="chooseBtn" id="chooseBtn">Choose song(s)</button>
+      <button class="downloadBtn" id="downloadBtn" title="Download current track">Download</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-weight:700;color:var(--muted)">Vol</span>
+        <input id="vol" type="range" min="0" max="1" step="0.01" value="0.9">
+      </div>
+      <button id="installBtn" class="instBtn">Install App</button>
+    </div>
+
+  </div>
+
+  <!-- PLAYLIST RIGHT -->
+  <div class="right" aria-label="Playlist area">
+    <div class="playlistTitle">Playlist</div>
+    <div class="playlist" id="playlist"></div>
+    <div class="footer">© 2025 • Made by Aniket Chaudhary</div>
+  </div>
+
+</div>
+
+<!-- audio element -->
+<audio id="audio" crossorigin="anonymous"></audio>
+
+<script>
+/* Full updated BeatX — fixes:
+   1) Title visible (beatx player made by aniket)
+   2) Lighter theme
+   3) Download: downloads chosen local files and tries fetch for remote
+   4) Playlist UI: add, click-to-play, remove, auto-next
+   5) PWA install button (beforeinstallprompt) + service worker + manifest
+*/
+
+(() => {
+  // DOM
+  const coverImg = document.getElementById('coverImg');
+  const rim = document.getElementById('rim');
+  const vbars = Array.from(document.querySelectorAll('.vbar'));
+  const playBtn = document.getElementById('playBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const chooseBtn = document.getElementById('chooseBtn');
+  const fileInput = document.getElementById('fileInput');
+  const playlistEl = document.getElementById('playlist');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const seek = document.getElementById('seek');
+  const currentTimeEl = document.getElementById('currentTime');
+  const totalTimeEl = document.getElementById('totalTime');
+  const vol = document.getElementById('vol');
+  const audio = document.getElementById('audio');
+  const disk = document.getElementById('disk');
+  const songTitle = document.getElementById('songTitle');
+  const installBtn = document.getElementById('installBtn');
+
+  // State
+  let playlist = []; // {src, name, file?, duration, savedPos}
+  let current = -1;
+  let isPlaying = false;
+
+  // AudioContext for visualizer
+  let audioCtx = null, analyser = null, sourceNode = null, raf = null;
+  const FFT = 256;
+  function ensureAudioCtx(){
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = FFT;
+      analyser.smoothingTimeConstant = 0.85;
+    }
+  }
+  function connectAudio(){
+    if(!audioCtx) ensureAudioCtx();
+    if(!sourceNode){
+      try{
+        sourceNode = audioCtx.createMediaElementSource(audio);
+        sourceNode.connect(analyser);
+        analyser.connect(audioCtx.destination);
+      }catch(e){ console.warn('Audio connect failed', e); }
+    }
+  }
+
+  // Visualizer draw
+  function startViz(){
+    if(!analyser) return;
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    cancelAnimationFrame(raf);
+    (function draw(){
+      analyser.getByteFrequencyData(data);
+      const step = Math.floor(data.length / vbars.length);
+      for(let i=0;i<vbars.length;i++){
+        const val = data[i*step] || 0;
+        const h = Math.max(8, Math.min(120, Math.round((val/255)*120)));
+        vbars[i].style.height = h + 'px';
+      }
+      // rim glow from bass
+      let bass=0; for(let i=0;i<8;i++) bass += data[i]||0; bass /= 8;
+      const g = Math.min(1, bass/120);
+      rim.style.boxShadow = `0 0 ${18 + g*48}px rgba(180,60,255,${0.10+g*0.32}), inset 0 0 ${20+g*45}px rgba(100,200,255,${0.04+g*0.18})`;
+      disk.style.transform = `scale(${1+g*0.01})`;
+      raf = requestAnimationFrame(draw);
+    })();
+  }
+  function stopViz(){ cancelAnimationFrame(raf); rim.style.boxShadow=''; vbars.forEach(b=>b.style.height='10px'); disk.style.transform=''; }
+
+  // Playlist UI
+  function renderPlaylist(){
+    playlistEl.innerHTML = '';
+    if(playlist.length===0){
+      const d = document.createElement('div'); d.style.color='rgba(255,255,255,0.4)'; d.style.padding='8px'; d.style.textAlign='center';
+      d.textContent = 'No songs — click "Choose song(s)"'; playlistEl.appendChild(d); return;
+    }
+    playlist.forEach((it, idx)=>{
+      const row = document.createElement('div'); row.className='playItem' + (idx===current ? ' active':'');
+      row.onclick = ()=> loadIndex(idx, true).then(()=> play());
+      const meta = document.createElement('div'); meta.className='playMeta';
+      const nm = document.createElement('div'); nm.className='playName'; nm.textContent = it.name;
+      meta.appendChild(nm);
+      const actions = document.createElement('div'); actions.className='playActions';
+      const playSmall = document.createElement('button'); playSmall.className='smallBtn'; playSmall.textContent='Play';
+      playSmall.onclick = (e)=>{ e.stopPropagation(); loadIndex(idx,true).then(()=> play()); };
+      const del = document.createElement('button'); del.className='smallBtn'; del.textContent='Delete';
+      del.onclick = (e)=>{ e.stopPropagation(); removeIndex(idx); };
+      actions.appendChild(playSmall); actions.appendChild(del);
+      row.appendChild(meta); row.appendChild(actions);
+      playlistEl.appendChild(row);
+    });
+  }
+
+  async function fileToEntry(file){
+    const src = URL.createObjectURL(file);
+    return new Promise(resolve=>{
+      const tmp = document.createElement('audio'); tmp.src = src;
+      const t = setTimeout(()=> resolve({src, file, name:file.name, duration:0}), 2500);
+      tmp.addEventListener('loadedmetadata', ()=>{ clearTimeout(t); resolve({src, file, name:file.name, duration: Math.floor(tmp.duration)}); });
+    });
+  }
+
+  async function addFiles(files){
+    const arr = Array.from(files).filter(f=>f.type.startsWith('audio'));
+    if(arr.length===0) return;
+    const entries = await Promise.all(arr.map(f=>fileToEntry(f)));
+    playlist.push(...entries);
+    if(current===-1) await loadIndex(0);
+    renderPlaylist();
+    try{ await play(); }catch(e){}
+  }
+
+  function removeIndex(i){
+    if(i<0||i>=playlist.length) return;
+    try{ if(playlist[i].file) URL.revokeObjectURL(playlist[i].src); }catch(e){}
+    playlist.splice(i,1);
+    if(i===current){ pause(); current=-1; if(playlist.length) loadIndex(0).then(()=> play()); else { audio.src=''; songTitle.textContent='No song selected'; seek.value=0; totalTimeEl.textContent='0:00'; } }
+    else if(i<current) current--;
+    renderPlaylist(); saveState();
+  }
+
+  // Load index
+  function loadIndex(i, jumpSaved=false){
+    return new Promise(resolve=>{
+      if(i<0||i>=playlist.length){ resolve(); return; }
+      current = i; const it = playlist[i];
+      audio.src = it.src; songTitle.textContent = it.name || 'Unknown';
+      coverImg.src = it.cover || it.src || coverImg.src;
+      audio.load();
+      audio.onloadedmetadata = ()=>{
+        seek.max = Math.floor(audio.duration||0); totalTimeEl.textContent = formatTime(audio.duration||0);
+        if(jumpSaved && it.savedPos) audio.currentTime = Math.min(it.savedPos, audio.duration-1);
+        saveState(); renderPlaylist(); resolve();
+      };
+      setTimeout(()=>{ saveState(); renderPlaylist(); resolve(); }, 1200);
+    });
+  }
+
+  // Play / Pause
+  async function play(){
+    if(!audio.src){ if(playlist.length) await loadIndex(0); else return; }
+    try{ if(audioCtx && audioCtx.state==='suspended') await audioCtx.resume(); }catch(e){}
+    await audio.play(); isPlaying = true; playBtn.textContent='⏸'; disk.classList.add('playing'); connectAudio(); startViz();
+  }
+  function pause(){ audio.pause(); isPlaying=false; playBtn.textContent='▶'; disk.classList.remove('playing'); stopViz(); }
+
+  // Prev / Next
+  function prev(){ if(playlist.length===0) return; if(audio.currentTime>3){ audio.currentTime=0; return; } const idx=(current-1+playlist.length)%playlist.length; loadIndex(idx,true).then(()=>play()); }
+  function next(){ if(playlist.length===0) return; const idx=(current+1)%playlist.length; loadIndex(idx,true).then(()=>play()); }
+
+  // Seek/time update
+  function formatTime(s){ s = Math.floor(s||0); const m = String(Math.floor(s/60)).padStart(2,'0'); const sec = String(s%60).padStart(2,'0'); return `${m}:${sec}`; }
+  audio.addEventListener('timeupdate', ()=>{ seek.value = Math.floor(audio.currentTime||0); currentTimeEl.textContent = formatTime(audio.currentTime||0); if(current>=0 && playlist[current]) playlist[current].savedPos = Math.floor(audio.currentTime||0); });
+  audio.addEventListener('ended', ()=> next());
+
+  // UI events
+  playBtn.addEventListener('click', ()=> isPlaying ? pause() : play());
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+
+  chooseBtn.addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', (e)=>{ addFiles(e.target.files); fileInput.value=''; });
+
+  seek.addEventListener('input', ()=> { audio.currentTime = Number(seek.value); });
+  vol.addEventListener('input', ()=> { audio.volume = Number(vol.value); saveState(); });
+
+  // Download button: supports local chosen files directly, remote via fetch
+  downloadBtn.addEventListener('click', async ()=>{
+    if(current<0 || !playlist[current]) return alert('No track selected to download');
+    const it = playlist[current];
+    if(it.file){
+      const a = document.createElement('a'); a.href = it.src; a.download = it.file.name; document.body.appendChild(a); a.click(); a.remove(); return;
+    }
+    try{
+      const res = await fetch(it.src);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = it.name || 'track.mp3'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }catch(e){ alert('Download not available for this track.'); }
+  });
+
+  // Save / load state
+  const KEY = 'beatx_v2_state';
+  function saveState(){ try{ const s = { index: current, time: Math.floor(audio.currentTime||0), vol: Number(vol.value) }; localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){} }
+  function loadState(){ try{ const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if(s && typeof s.index==='number'){ if(playlist.length && playlist[s.index]){ current = s.index; playlist[current].savedPos = s.time || 0; vol.value = s.vol ?? vol.value; audio.volume = Number(vol.value); loadIndex(current,true); } } }catch(e){} }
+  window.addEventListener('beforeunload', ()=> saveState());
+
+  // Keyboard
+  document.addEventListener('keydown', (e)=>{ if(e.code==='Space'){ e.preventDefault(); isPlaying ? pause() : play(); } if(e.key==='ArrowRight') audio.currentTime = Math.min(audio.duration||0, audio.currentTime+10); if(e.key==='ArrowLeft') audio.currentTime = Math.max(0, audio.currentTime-10); });
+
+  // Render playlist initially
+  renderPlaylist();
+  loadState();
+
+  // PWA: manifest and service worker + Install prompt handling
+  (function setupPWA(){
+    // manifest
+    try{
+      const manifest = { name: "BeatX — Made by Aniket", short_name:"BeatX", start_url:".", display:"standalone", background_color:"#062034", theme_color:"#60ddff", description:"BeatX music player by Aniket", icons:[] };
+      const blob = new Blob([JSON.stringify(manifest)],{type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('link'); link.rel='manifest'; link.href=url; document.head.appendChild(link);
+    }catch(e){ console.warn('manifest error', e); }
+
+    // simple service worker
+    const sw = `
+self.addEventListener('install', e=>{ self.skipWaiting(); });
+self.addEventListener('activate', e=>{ clients.claim(); });
+self.addEventListener('fetch', e=>{
+  e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));
+});
+`;
+    try{
+      const blob = new Blob([sw], {type:'application/javascript'});
+      const swUrl = URL.createObjectURL(blob);
+      if('serviceWorker' in navigator) navigator.serviceWorker.register(swUrl).then(()=>console.log('SW registered')).catch(()=>console.warn('SW registration failed'));
+    }catch(e){ console.warn('sw blob fail', e); }
+
+    // Install prompt
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e)=>{
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-block';
+    });
+    installBtn.addEventListener('click', async ()=>{
+      if(!deferredPrompt) { alert('Install not available'); return; }
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      if(choice.outcome === 'accepted') { console.log('User accepted install'); installBtn.style.display='none'; deferredPrompt=null; }
+      else { console.log('User dismissed install'); }
+    });
+  })();
+
+  // expose for debug
+  window.BeatX = { playlist, addFiles, play, pause, loadIndex, removeIndex };
+
+  // ensure audio context on first gesture (some browsers require)
+  document.addEventListener('click', function onFirst(){ try{ if(!audioCtx) ensureAudioCtx(); }catch(e){} document.removeEventListener('click', onFirst); }, {once:true});
+})();
+</script>
+
+</body>
+</html>

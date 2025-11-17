@@ -1,0 +1,149 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* BODY */
+body {
+    background: #0d0d1f;
+    color: white;
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+/* MAIN PLAYER CARD */
+.player {
+    width: 380px;
+    padding: 35px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 25px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+/* PLAYER TITLE (BEATX) */
+.player-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    background: linear-gradient(90deg, #ff73fa, #6ddcff);
+    -webkit-background-clip: text;
+    color: transparent;
+
+    /* FIX: Title visibility */
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+/* ALBUM BOX */
+.album-box {
+    width: 230px;
+    height: 230px;
+    margin: 0 auto;
+    border-radius: 25px;
+    overflow: hidden;
+
+    /* FIX: No dark overlay */
+    background: none;
+
+    border: 2px solid rgba(255,255,255,0.25);
+
+    /* FIX: Rotation visible */
+    animation: rotateAlbum 12s linear infinite;
+}
+
+/* IMAGE */
+.album-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    /* FIX: Remove darkness */
+    filter: brightness(1.1);
+}
+
+@keyframes rotateAlbum {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* SONG NAME */
+.song-name {
+    margin: 18px 0;
+    font-size: 16px;
+    font-weight: 600;
+
+    /* FIX: Visibility */
+    text-shadow: 0 0 10px rgba(255,255,255,0.7);
+}
+
+/* CONTROLS */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin: 25px 0;
+}
+
+.btn {
+    width: 65px;
+    height: 65px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* SEEK BAR */
+.seek {
+    width: 100%;
+    margin-top: 10px;
+}
+
+input[type="range"] {
+    width: 100%;
+}
+
+/* FILE SELECT + DOWNLOAD */
+.bottom-area {
+    margin-top: 25px;
+}
+
+.bottom-area button,
+.bottom-area label {
+    background: linear-gradient(90deg, #ff73fa, #6ddcff);
+    color: black;
+    font-weight: 600;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+#fileName {
+    margin-left: 10px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* FOOTER */
+.footer {
+    margin-top: 25px;
+    font-size: 13px;
+    opacity: 0.7;
+}
